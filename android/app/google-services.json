@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "135925086286",
+    "project_id": "farming-f3285",
+    "storage_bucket": "farming-f3285.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:135925086286:android:615467cff9aab25e982b1f",
+        "android_client_info": {
+          "package_name": "com.farming"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDqBibNoHYjZnIcqpwesUmCmOyvbhfiXk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
