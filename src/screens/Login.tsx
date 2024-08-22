@@ -1,17 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import Field from '../components/Field';
 import Buttons from '../components/Buttons';
+import auth from '@react-native-firebase/auth';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
     Login: undefined;
     SignUp: undefined;
+    Dashboard: undefined; // Assuming you have a Dashboard screen
 };
 
 type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 const Login: React.FC<LoginProps> = ({ navigation }) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLogin = async () => {
+        try {
+            const userCredential = await auth().signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            if (user.emailVerified) {
+                Alert.alert('Success', 'Logged in successfully!');
+                navigation.navigate('Dashboard');
+            } else {
+                Alert.alert('Error', 'Please verify your email before logging in.');
+            }
+        } catch (error) {
+            Alert.alert('Login Error', (error as Error).message);
+        }
+    };
+
     const signupNavigation = () => {
         navigation.navigate('SignUp');
     };
@@ -35,8 +56,16 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                 placeholder="Email / Username"
                 keyboardType="email-address"
                 margin={25}
+                value={email}
+                onChangeText={setEmail}
             />
-            <Field placeholder="Password" secureTextEntry={true} margin={0} />
+            <Field
+                placeholder="Password"
+                secureTextEntry={true}
+                margin={0}
+                value={password}
+                onChangeText={setPassword}
+            />
             <View
                 style={{
                     alignItems: 'flex-end',
@@ -56,7 +85,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                     Forgot password ?
                 </Text>
             </View>
-            <Buttons btnLabel="Login" onPressHandler={() => Alert.alert('Logged In')} />
+            <Buttons btnLabel="Login" onPressHandler={handleLogin} />
             <View
                 style={{
                     display: 'flex',
