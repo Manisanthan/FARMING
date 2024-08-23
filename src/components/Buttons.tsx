@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-// Define the props for the Buttons component
+
 interface ButtonsProps {
     btnLabel: string;
     marginTop?: number;

@@ -12,8 +12,9 @@ const Field: React.FC<FieldProps> = ({ margin, marginBottom, ...props }) => {
         <TextInput
             {...props}
             style={{
+                fontSize:16,
+                color:"black",
                 borderRadius: 100,
-                color: 'darkGreen',
                 paddingHorizontal: 20,
                 width: '80%',
                 backgroundColor: '#A9A9A9',

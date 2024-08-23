@@ -27,7 +27,7 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
                 style={{
                     flex: 1,
                     alignItems: 'center',
-                    marginTop: 150,
+                    marginTop: 260,
                     height: '100%',
                     width: '100%',
                 }}
@@ -48,7 +48,7 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
 
                 <Buttons
                     btnLabel="SIGNUP"
-                    marginTop={270}
+                    marginTop={290}
                     onPressHandler={signupNavigation}
                 />
                 <Buttons

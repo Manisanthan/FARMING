@@ -5,12 +5,15 @@ import Login from '../screens/Login';
 import SignUp from '../screens/SignUp';
 import Home from '../screens/Home';
 import Dashboard from '../screens/Dashboard';
+import VerifyCode from '../screens/VerifyCode';
 
-type RootStackParamList = {
+
+export type RootStackParamList = {
     Home: undefined;
     Login: undefined;
     SignUp: undefined;
     Dashboard: undefined;
+    VerifyCode: { phoneNumber: string; confirmation: any };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -23,6 +26,7 @@ const AppNavigator: React.FC = () => {
                 <Stack.Screen name="Login" component={Login} />
                 <Stack.Screen name="SignUp" component={SignUp} />
                 <Stack.Screen name="Dashboard" component={Dashboard} />
+                <Stack.Screen name="VerifyCode" component={VerifyCode} />
             </Stack.Navigator>
         </NavigationContainer>
     );

@@ -8,7 +8,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 type RootStackParamList = {
     Login: undefined;
     SignUp: undefined;
-    Dashboard: undefined; // Assuming you have a Dashboard screen
+    Dashboard: undefined;
 };
 
 type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
@@ -44,18 +44,19 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                     color: '#003300',
                     fontSize: 70,
                     fontWeight: 'bold',
-                    marginVertical: 50,
+                    marginVertical: 20,
+                    marginTop:230,
                 }}
             >
                 Login
             </Text>
-            <Text style={{ color: '#333333', fontSize: 20, fontWeight: 'bold' }}>
+            <Text style={{ color: '#333333',marginTop:0, fontSize: 20, fontWeight: 'bold' }}>
                 Login To Your Account
             </Text>
             <Field
-                placeholder="Email / Username"
+                placeholder="Email / Mobile Number"
                 keyboardType="email-address"
-                margin={25}
+                margin={20}
                 value={email}
                 onChangeText={setEmail}
             />
@@ -71,7 +72,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                     alignItems: 'flex-end',
                     width: '80%',
                     paddingRight: 16,
-                    marginBottom: 230,
+                    marginBottom: 220,
                 }}
             >
                 <Text
@@ -85,13 +86,13 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                     Forgot password ?
                 </Text>
             </View>
-            <Buttons btnLabel="Login" onPressHandler={handleLogin} />
+            <Buttons btnLabel="Login" marginTop={15} onPressHandler={handleLogin} />
             <View
                 style={{
                     display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'center',
-                    marginTop: 5,
+                    marginTop: 15,
                 }}
             >
                 <Text style={{ color: 'black' }}>

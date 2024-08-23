@@ -9,7 +9,7 @@ const firebaseConfig = {
   storageBucket: 'farming-f3285.appspot.com',
   messagingSenderId: '135925086286',
   appId: '1:135925086286:android:615467cff9aab25e982b1f',
-  measurementId: 'G-XXXXXXXXXX' // Add your actual measurementId here if needed
+  measurementId: 'G-XXXXXXXXXX' 
 };
 
 if (!firebase.apps.length) {

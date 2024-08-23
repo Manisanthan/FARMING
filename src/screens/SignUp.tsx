@@ -4,10 +4,13 @@ import Field from '../components/Field';
 import Buttons from '../components/Buttons';
 import auth from '@react-native-firebase/auth';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import firebase from '@react-native-firebase/app';
 
 type RootStackParamList = {
     Login: undefined;
     SignUp: undefined;
+    Dashboard: undefined;
+    VerifyCode: { phoneNumber: string; confirmation: any };
 };
 
 type SignUpProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
@@ -17,6 +20,7 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [isVerifyingByEmail, setIsVerifyingByEmail] = useState(true);
 
     const handleSignUp = async () => {
         if (password !== confirmPassword) {
@@ -25,18 +29,26 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
         }
 
         try {
-            const userCredential = await auth().createUserWithEmailAndPassword(email, password);
-            const user = userCredential.user;
+            if (isVerifyingByEmail) {
+                const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
 
-            await user.sendEmailVerification();
+                await user.sendEmailVerification();
+                Alert.alert('Success', 'Account created. Please verify your email.');
+                navigation.navigate('Login');
+            } else {
+                const formattedPhoneNumber = phoneNumber.startsWith('+91') ? phoneNumber : '+91' + phoneNumber;
 
-            // Sign up with phone number (requires verification)
-            // const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-            // You need to verify the phone number with the code sent to the user.
-            // Here you would typically show a modal or navigate to another screen to enter the verification code.
+                try {
+                    const confirmation = await auth().signInWithPhoneNumber(formattedPhoneNumber);
+                    navigation.navigate('VerifyCode', { phoneNumber: formattedPhoneNumber, confirmation });
+                } catch (error) {
+                    Alert.alert('Error', 'Failed to sign in with phone number. Please try again.');
+                }
+            }
 
-            Alert.alert('Success', 'Account created. Please verify your email.');
-            navigation.navigate('Login');
+
+
         } catch (error) {
             console.error((error as Error).message);
             Alert.alert('Error', (error as Error).message);
@@ -54,7 +66,9 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
                     color: '#003300',
                     fontSize: 70,
                     fontWeight: 'bold',
-                    marginVertical: 50,
+                    marginVertical: 220,
+                    marginBottom:30,
+                    
                 }}
             >
                 SignUp
@@ -69,42 +83,53 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
             >
                 SignUp To Create Your Account
             </Text>
-            <Field
-                placeholder="Email / Username"
-                keyboardType="email-address"
-                marginBottom={25}
-                value={email}
-                onChangeText={setEmail}
-            />
-            <Field
-                placeholder="Mobile Number"
-                keyboardType="number-pad"
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
-            />
+
+            {isVerifyingByEmail ? (
+                <>
+                    <Field
+                        placeholder="Email-Id"
+                        keyboardType="email-address"
+                        marginBottom={1}
+                        value={email}
+                        onChangeText={setEmail}
+                    />
+                </>
+            ) : (
+                <>
+                    <Field
+                        placeholder="Mobile Number"
+                        keyboardType="email-address"
+                        marginBottom={1}
+                        value={phoneNumber}
+                        onChangeText={setPhoneNumber}
+                    />
+                </>
+            )}
+
             <Field
                 placeholder="Create Password"
                 secureTextEntry={true}
-                margin={25}
+                margin={20}
                 value={password}
                 onChangeText={setPassword}
             />
             <Field
                 placeholder="Confirm Password"
                 secureTextEntry={true}
-                margin={0}
+                margin={2}
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
             />
-            <View
-                style={{
-                    alignItems: 'flex-end',
-                    width: '80%',
-                    paddingRight: 16,
-                    marginBottom: 120,
-                }}
-            />
-            <Buttons btnLabel="SignUp" onPressHandler={handleSignUp} />
+
+            <Buttons btnLabel="SignUp" marginTop={170} onPressHandler={handleSignUp} />
+            <TouchableOpacity
+                style={{ marginVertical: 5 }}
+                onPress={() => setIsVerifyingByEmail(!isVerifyingByEmail)}
+            >
+                <Text style={{ color: '#003300', fontWeight: 'bold' }}>
+                    {isVerifyingByEmail ? 'Use Mobile Number Instead' : 'Use Email Instead'}
+                </Text>
+            </TouchableOpacity>
             <View
                 style={{
                     display: 'flex',
