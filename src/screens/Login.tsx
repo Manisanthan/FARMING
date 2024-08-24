@@ -9,27 +9,39 @@ type RootStackParamList = {
     Login: undefined;
     SignUp: undefined;
     Dashboard: undefined;
+    VerifyCode: { phoneNumber: string; confirmation: any };
 };
 
 type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 const Login: React.FC<LoginProps> = ({ navigation }) => {
-    const [email, setEmail] = useState('');
+    const [emailOrPhone, setEmailOrPhone] = useState('');
     const [password, setPassword] = useState('');
 
     const handleLogin = async () => {
-        try {
-            const userCredential = await auth().signInWithEmailAndPassword(email, password);
-            const user = userCredential.user;
+        if (isNaN(Number(emailOrPhone))) {
+            try {
+                const userCredential = await auth().signInWithEmailAndPassword(emailOrPhone, password);
+                const user = userCredential.user;
 
-            if (user.emailVerified) {
-                Alert.alert('Success', 'Logged in successfully!');
-                navigation.navigate('Dashboard');
-            } else {
-                Alert.alert('Error', 'Please verify your email before logging in.');
+                if (user.emailVerified) {
+                    Alert.alert('Success', 'Logged in successfully!');
+                    navigation.navigate('Dashboard');
+                } else {
+                    Alert.alert('Error', 'Please verify your email before logging in.');
+                }
+            } catch (error) {
+                Alert.alert('Login Error', (error as Error).message);
             }
-        } catch (error) {
-            Alert.alert('Login Error', (error as Error).message);
+        } else {
+            const formattedPhoneNumber = emailOrPhone.startsWith('+91') ? emailOrPhone : '+91' + emailOrPhone;
+
+            try {
+                const confirmation = await auth().signInWithPhoneNumber(formattedPhoneNumber);
+                navigation.navigate('VerifyCode', { phoneNumber: formattedPhoneNumber, confirmation });
+            } catch (error) {
+                Alert.alert('Error', 'Failed to sign in with phone number. Please try again.');
+            }
         }
     };
 
@@ -45,20 +57,20 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                     fontSize: 70,
                     fontWeight: 'bold',
                     marginVertical: 20,
-                    marginTop:230,
+                    marginTop: 230,
                 }}
             >
                 Login
             </Text>
-            <Text style={{ color: '#333333',marginTop:0, fontSize: 20, fontWeight: 'bold' }}>
+            <Text style={{ color: '#333333', marginTop: 0, fontSize: 20, fontWeight: 'bold' }}>
                 Login To Your Account
             </Text>
             <Field
                 placeholder="Email / Mobile Number"
                 keyboardType="email-address"
                 margin={20}
-                value={email}
-                onChangeText={setEmail}
+                value={emailOrPhone}
+                onChangeText={setEmailOrPhone}
             />
             <Field
                 placeholder="Password"
@@ -83,7 +95,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                         marginTop: 15,
                     }}
                 >
-                    Forgot password ?
+                    Forgot password?
                 </Text>
             </View>
             <Buttons btnLabel="Login" marginTop={15} onPressHandler={handleLogin} />

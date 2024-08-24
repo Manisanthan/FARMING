@@ -14,7 +14,7 @@ const VerifyCode: React.FC<VerifyCodeProps> = ({ route, navigation }) => {
         try {
             await confirmation.confirm(code);
             Alert.alert('Success', 'Phone number verified successfully!');
-            navigation.navigate('Login');
+            navigation.navigate('Dashboard');
         } catch (error) {
             Alert.alert('Error', 'Invalid code. Please try again.');
         }

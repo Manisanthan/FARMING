@@ -106,22 +106,33 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
                 </>
             )}
 
-            <Field
-                placeholder="Create Password"
-                secureTextEntry={true}
-                margin={20}
-                value={password}
-                onChangeText={setPassword}
-            />
-            <Field
-                placeholder="Confirm Password"
-                secureTextEntry={true}
-                margin={2}
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-            />
-
-            <Buttons btnLabel="SignUp" marginTop={170} onPressHandler={handleSignUp} />
+            {isVerifyingByEmail && (
+                <>
+                    <Field
+                        placeholder="Create Password"
+                        secureTextEntry={true}
+                        margin={20}
+                        value={password}
+                        onChangeText={setPassword}
+                    />
+                    <Field
+                        placeholder="Confirm Password"
+                        secureTextEntry={true}
+                        margin={2}
+                        value={confirmPassword}
+                        onChangeText={setConfirmPassword}
+                    />
+                </>
+            )}
+            {isVerifyingByEmail?(
+                <>
+                    <Buttons btnLabel="SignUp" marginTop={170} onPressHandler={handleSignUp} />
+                </>
+            ):(
+                <>
+                    <Buttons btnLabel="Send OTP" marginTop={310} onPressHandler={handleSignUp} />
+                </>
+            )}
             <TouchableOpacity
                 style={{ marginVertical: 5 }}
                 onPress={() => setIsVerifyingByEmail(!isVerifyingByEmail)}
