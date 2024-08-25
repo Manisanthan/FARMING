@@ -5,6 +5,7 @@ import Buttons from '../components/Buttons';
 import auth from '@react-native-firebase/auth';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import firebase from '@react-native-firebase/app';
+import firestore from '@react-native-firebase/firestore';
 
 type RootStackParamList = {
     Login: undefined;
@@ -18,6 +19,7 @@ type SignUpProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isVerifyingByEmail, setIsVerifyingByEmail] = useState(true);
@@ -32,12 +34,23 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
             if (isVerifyingByEmail) {
                 const userCredential = await auth().createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
+                const userData={
+                    email: email,
+                    username:username,
+                    password:password,
+                };
+                await firestore().collection('users').doc(user.uid).set(userData);
 
                 await user.sendEmailVerification();
                 Alert.alert('Success', 'Account created. Please verify your email.');
                 navigation.navigate('Login');
             } else {
                 const formattedPhoneNumber = phoneNumber.startsWith('+91') ? phoneNumber : '+91' + phoneNumber;
+                const user1 = {
+                    username: username,
+                    password: password,
+                };
+                await firestore().collection('users').add(user1);
 
                 try {
                     const confirmation = await auth().signInWithPhoneNumber(formattedPhoneNumber);
@@ -106,33 +119,28 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
                 </>
             )}
 
-            {isVerifyingByEmail && (
-                <>
-                    <Field
-                        placeholder="Create Password"
-                        secureTextEntry={true}
-                        margin={20}
-                        value={password}
-                        onChangeText={setPassword}
-                    />
-                    <Field
-                        placeholder="Confirm Password"
-                        secureTextEntry={true}
-                        margin={2}
-                        value={confirmPassword}
-                        onChangeText={setConfirmPassword}
-                    />
-                </>
-            )}
-            {isVerifyingByEmail?(
-                <>
-                    <Buttons btnLabel="SignUp" marginTop={170} onPressHandler={handleSignUp} />
-                </>
-            ):(
-                <>
-                    <Buttons btnLabel="Send OTP" marginTop={310} onPressHandler={handleSignUp} />
-                </>
-            )}
+            <Field
+                placeholder="Username"
+                margin={20}
+                marginBottom={0}
+                value={username}
+                onChangeText={setUsername}
+            />
+            <Field
+                placeholder="Create Password"
+                secureTextEntry={true}
+                margin={20}
+                value={password}
+                onChangeText={setPassword}
+            />
+            <Field
+                placeholder="Confirm Password"
+                secureTextEntry={true}
+                margin={2}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+            />
+            <Buttons btnLabel="SignUp" marginTop={110} onPressHandler={handleSignUp} />
             <TouchableOpacity
                 style={{ marginVertical: 5 }}
                 onPress={() => setIsVerifyingByEmail(!isVerifyingByEmail)}

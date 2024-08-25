@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import Field from '../components/Field';
 import Buttons from '../components/Buttons';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
@@ -15,35 +16,59 @@ type RootStackParamList = {
 type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 const Login: React.FC<LoginProps> = ({ navigation }) => {
-    const [emailOrPhone, setEmailOrPhone] = useState('');
+    const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
 
     const handleLogin = async () => {
-        if (isNaN(Number(emailOrPhone))) {
-            try {
-                const userCredential = await auth().signInWithEmailAndPassword(emailOrPhone, password);
-                const user = userCredential.user;
+        try {
+            let email;
+            let p1;
 
-                if (user.emailVerified) {
-                    Alert.alert('Success', 'Logged in successfully!');
-                    navigation.navigate('Dashboard');
+            if (identifier.includes('@')) {
+                email = identifier;
+            } else {
+                const usersRef = firestore().collection('users');
+                const querySnapshot = await usersRef.where('username', '==', identifier).get();
+
+                if (!querySnapshot.empty) {
+                    const userDoc = querySnapshot.docs[0];
+                    email = userDoc.data().email;
+                    p1=userDoc.data().password;
+                    console.log(p1);
+                    console.log(password);
                 } else {
-                    Alert.alert('Error', 'Please verify your email before logging in.');
+                    Alert.alert('Error', 'No user found with this username.');
+                    return;
                 }
-            } catch (error) {
-                Alert.alert('Login Error', (error as Error).message);
             }
-        } else {
-            const formattedPhoneNumber = emailOrPhone.startsWith('+91') ? emailOrPhone : '+91' + emailOrPhone;
+            if(email==null){
+                if (p1 == password) {
+                    navigation.navigate("Dashboard");
+                }
+                else{
+                    Alert.alert('Incorrect password.');
+                    return;
+                }
+            }
+            else{
 
-            try {
-                const confirmation = await auth().signInWithPhoneNumber(formattedPhoneNumber);
-                navigation.navigate('VerifyCode', { phoneNumber: formattedPhoneNumber, confirmation });
-            } catch (error) {
-                Alert.alert('Error', 'Failed to sign in with phone number. Please try again.');
+            const userCredential = await auth().signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            if(user.emailVerified){
+                navigation.navigate("Dashboard");
             }
+            else {
+                Alert.alert('Incorrect Email / password.');
+                return;
+            }
+            
         }
-    };
+            
+        } catch (error) {
+            console.error((error as Error).message);
+            Alert.alert('Error', (error as Error).message);
+        }
+   };
 
     const signupNavigation = () => {
         navigation.navigate('SignUp');
@@ -66,11 +91,11 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                 Login To Your Account
             </Text>
             <Field
-                placeholder="Email / Mobile Number"
+                placeholder="Email / Username"
                 keyboardType="email-address"
                 margin={20}
-                value={emailOrPhone}
-                onChangeText={setEmailOrPhone}
+                value={identifier}
+                onChangeText={setIdentifier}
             />
             <Field
                 placeholder="Password"
