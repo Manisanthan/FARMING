@@ -3,6 +3,7 @@ import { View, Text } from 'react-native';
 import Background from '../components/Background';
 import Buttons from '../components/Buttons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import fontfamillies from '../../styles/fontfamillies';
 
 type RootStackParamList = {
     Home: undefined;
@@ -34,15 +35,17 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
             >
                 <Text
                     style={{
+                        fontFamily: fontfamillies.oleo,
                         color: '#CEFD45',
                         fontSize: 50,
-                        fontWeight: 'bold',
                         marginTop: 80,
-                    }}
-                >
+                    }}>
                     AI FARMING
                 </Text>
-                <Text style={{ color: '#CEFD45', fontSize: 14, fontWeight: '400' }}>
+                <Text style={{
+                    fontFamily: fontfamillies.oleo1,
+                    color: '#CEFD45', fontSize: 15,
+                }}>
                     Innovate Your Farm with AI Solutions.
                 </Text>
 

@@ -1,0 +1,13 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/Fonts/OleoScriptBold.ttf",
+      "sha1": "dff875ee231c576614c16e4111138989845f63d0"
+    },
+    {
+      "path": "src/Fonts/OleoScriptRegular.ttf",
+      "sha1": "ab4a01f1970629a256a0b7fae61527179d929750"
+    }
+  ]
+}

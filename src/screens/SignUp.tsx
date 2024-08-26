@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import Field from '../components/Field';
 import Buttons from '../components/Buttons';
 import auth from '@react-native-firebase/auth';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import firebase from '@react-native-firebase/app';
 import firestore from '@react-native-firebase/firestore';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 type RootStackParamList = {
     Login: undefined;
@@ -99,6 +100,8 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
 
             {isVerifyingByEmail ? (
                 <>
+                <View style={styles.container1}>
+                    <Icon name="envelope" size={23} color="#666" style={{ marginRight: 0 }} />
                     <Field
                         placeholder="Email-Id"
                         keyboardType="email-address"
@@ -106,33 +109,42 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
                         value={email}
                         onChangeText={setEmail}
                     />
+                </View>
                 </>
             ) : (
                 <>
+                <View style={styles.container1}>
+                    <Icon name="phone-alt" size={23} color="#666" style={{ marginRight: 0 }} />
                     <Field
                         placeholder="Mobile Number"
-                        keyboardType="email-address"
+                        keyboardType="phone-pad"
                         marginBottom={1}
                         value={phoneNumber}
                         onChangeText={setPhoneNumber}
                     />
+                </View>
                 </>
             )}
-
+            <View style={styles.container1}>
+                <Icon name="user" size={23} color="#666" style={{ marginRight: 0 }} />
             <Field
                 placeholder="Username"
-                margin={20}
                 marginBottom={0}
                 value={username}
                 onChangeText={setUsername}
             />
+            </View>
+            <View style={styles.container1}>
+                <Icon name="lock" size={23} color="#666" style={{ marginRight: 0 }} />
             <Field
                 placeholder="Create Password"
                 secureTextEntry={true}
-                margin={20}
                 value={password}
                 onChangeText={setPassword}
             />
+            </View>
+            <View style={styles.container1}>
+                <Icon name="lock" size={23} color="#666" style={{ marginRight: 0 }} />
             <Field
                 placeholder="Confirm Password"
                 secureTextEntry={true}
@@ -140,7 +152,8 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
             />
-            <Buttons btnLabel="SignUp" marginTop={110} onPressHandler={handleSignUp} />
+            </View>
+            <Buttons btnLabel="SignUp" marginTop={100} onPressHandler={handleSignUp} />
             <TouchableOpacity
                 style={{ marginVertical: 5 }}
                 onPress={() => setIsVerifyingByEmail(!isVerifyingByEmail)}
@@ -165,5 +178,17 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
         </View>
     );
 };
-
+const styles=StyleSheet.create({
+    container1:{
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 30,
+        paddingHorizontal: 20,
+        marginVertical: 8,
+        width: '80%',
+        backgroundColor: '#A9A9A9',
+    }
+})
 export default SignUp;

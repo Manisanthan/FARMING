@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import Field from '../components/Field';
 import Buttons from '../components/Buttons';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import Icon  from 'react-native-vector-icons/FontAwesome5';
 
 type RootStackParamList = {
     Login: undefined;
@@ -90,20 +91,25 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             <Text style={{ color: '#333333', marginTop: 0, fontSize: 20, fontWeight: 'bold' }}>
                 Login To Your Account
             </Text>
-            <Field
-                placeholder="Email / Username"
-                keyboardType="email-address"
-                margin={20}
-                value={identifier}
-                onChangeText={setIdentifier}
-            />
-            <Field
-                placeholder="Password"
-                secureTextEntry={true}
-                margin={0}
-                value={password}
-                onChangeText={setPassword}
-            />
+            <View style={Styles.container}>
+                <Icon name="user" size={23} color="#666" style={{ marginRight: 0 }} />
+                <Field
+                    placeholder="Email / Username"
+                    keyboardType="email-address"
+                    value={identifier}
+                    onChangeText={setIdentifier}
+                />
+            </View>
+            <View style={Styles.container1}>
+                <Icon name="lock" size={23} color="#666" style={{ marginRight: 0 }} />
+                <Field
+                    placeholder="Password"
+                    secureTextEntry={true}
+                    margin={0}
+                    value={password}
+                    onChangeText={setPassword}
+                 />
+            </View>
             <View
                 style={{
                     alignItems: 'flex-end',
@@ -144,5 +150,29 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
         </View>
     );
 };
+const Styles=StyleSheet.create({
+    container:{
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 30,
+        paddingHorizontal: 20,
+        marginVertical: 20,
+        width: '80%',
+        backgroundColor: '#A9A9A9',
+    },
+    container1: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 30,
+        paddingHorizontal: 20,
+        marginVertical: 0,
+        width: '80%',
+        backgroundColor: '#A9A9A9',
+    }
+})
 
 export default Login;
