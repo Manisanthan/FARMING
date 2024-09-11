@@ -5,7 +5,7 @@ import Buttons from '../components/Buttons';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Icon  from 'react-native-vector-icons/FontAwesome5';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 type RootStackParamList = {
     Login: undefined;
@@ -19,6 +19,7 @@ type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 const Login: React.FC<LoginProps> = ({ navigation }) => {
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
+
 
     const handleLogin = async () => {
         try {
@@ -34,42 +35,73 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                 if (!querySnapshot.empty) {
                     const userDoc = querySnapshot.docs[0];
                     email = userDoc.data().email;
-                    p1=userDoc.data().password;
-                    console.log(p1);
-                    console.log(password);
+                    p1 = userDoc.data().password;
                 } else {
                     Alert.alert('Error', 'No user found with this username.');
                     return;
                 }
             }
-            if(email==null){
+            if (email == null) {
                 if (p1 == password) {
                     navigation.navigate("Dashboard");
                 }
-                else{
+                else {
                     Alert.alert('Incorrect password.');
                     return;
                 }
             }
-            else{
-
-            const userCredential = await auth().signInWithEmailAndPassword(email, password);
-            const user = userCredential.user;
-            if(user.emailVerified){
-                navigation.navigate("Dashboard");
-            }
             else {
-                Alert.alert('Incorrect Email / password.');
-                return;
+
+                const userCredential = await auth().signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                if (user.emailVerified) {
+                    navigation.navigate("Dashboard");
+                }
+                else {
+                    Alert.alert('Incorrect Email / password.');
+                    return;
+                }
+
             }
-            
-        }
-            
+
         } catch (error) {
             console.error((error as Error).message);
             Alert.alert('Error', (error as Error).message);
         }
-   };
+    };
+
+    const ForgotPassword = async () => {
+        if (!identifier) {
+            Alert.alert('Error', 'Please enter your email or username.');
+            return;
+        }
+        try {
+            let email;
+            if (identifier.includes('@')) {
+                email = identifier;
+            }
+            else {
+                const usersRef = firestore().collection('users');
+                const querySnapshot = await usersRef.where('username', '==', identifier).get();
+
+                if (!querySnapshot.empty) {
+                    const userDoc = querySnapshot.docs[0];
+                    email = userDoc.data().email;
+                } else {
+                    Alert.alert('Error', 'No user found with this username.');
+                    return;
+                }
+            }
+
+            await auth().sendPasswordResetEmail(email);
+            Alert.alert('Success', 'Password reset email sent! Check your inbox.');
+        } catch (error) {
+            console.error((error as Error).message);
+            Alert.alert('Error', (error as Error).message);
+        }
+    };
+
+
 
     const signupNavigation = () => {
         navigation.navigate('SignUp');
@@ -108,7 +140,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                     margin={0}
                     value={password}
                     onChangeText={setPassword}
-                 />
+                />
             </View>
             <View
                 style={{
@@ -118,16 +150,18 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                     marginBottom: 220,
                 }}
             >
-                <Text
-                    style={{
-                        color: '#003300',
-                        fontWeight: 'bold',
-                        fontSize: 16,
-                        marginTop: 15,
-                    }}
-                >
-                    Forgot password?
-                </Text>
+                <TouchableOpacity onPress={ForgotPassword}>
+                    <Text
+                        style={{
+                            color: '#003300',
+                            fontWeight: 'bold',
+                            fontSize: 16,
+                            marginTop: 15,
+                        }}
+                    >
+                        Forgot password?
+                    </Text>
+                </TouchableOpacity>
             </View>
             <Buttons btnLabel="Login" marginTop={15} onPressHandler={handleLogin} />
             <View
@@ -150,8 +184,8 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
         </View>
     );
 };
-const Styles=StyleSheet.create({
-    container:{
+const Styles = StyleSheet.create({
+    container: {
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
