@@ -24,6 +24,7 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isVerifyingByEmail, setIsVerifyingByEmail] = useState(true);
+    const [userId,setUserId]=useState('');
 
     const handleSignUp = async () => {
         if (password !== confirmPassword) {
@@ -39,7 +40,9 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
                     email: email,
                     username:username,
                     password:password,
+                    
                 };
+                setUserId(user.uid);
                 await firestore().collection('users').doc(user.uid).set(userData);
 
                 await user.sendEmailVerification();
@@ -48,10 +51,11 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
             } else {
                 const formattedPhoneNumber = phoneNumber.startsWith('+91') ? phoneNumber : '+91' + phoneNumber;
                 const user1 = {
+                    phoneNumber:phoneNumber,
                     username: username,
                     password: password,
                 };
-                await firestore().collection('users').add(user1);
+                await firestore().collection('users').doc(userId).set(user1);
 
                 try {
                     const confirmation = await auth().signInWithPhoneNumber(formattedPhoneNumber);

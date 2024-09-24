@@ -10,7 +10,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 type RootStackParamList = {
     Login: undefined;
     SignUp: undefined;
-    Dashboard: undefined;
+    Dashboard: {uid:String};
     VerifyCode: { phoneNumber: string; confirmation: any };
 };
 
@@ -43,7 +43,10 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             }
             if (email == null) {
                 if (p1 == password) {
-                    navigation.navigate("Dashboard");
+                    const user1=firestore().collection('users');
+                    const query = await user1.where('username', '==', identifier).get();
+                    const u1=query.docs[0];
+                    navigation.navigate("Dashboard", { uid: u1.id });
                 }
                 else {
                     Alert.alert('Incorrect password.');
@@ -55,7 +58,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                 const userCredential = await auth().signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 if (user.emailVerified) {
-                    navigation.navigate("Dashboard");
+                    navigation.navigate("Dashboard",{ uid: user.uid});
                 }
                 else {
                     Alert.alert('Incorrect Email / password.');
