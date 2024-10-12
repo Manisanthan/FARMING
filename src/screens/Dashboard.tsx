@@ -1,96 +1,84 @@
-import React,{useState} from 'react';
-import { View, Text, Button, StyleSheet,Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Button, StyleSheet, Alert, Touchable, TouchableOpacity, ImageBackground } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Buttons from '../components/Buttons';
 import axios from 'axios';
 import Field from '../components/Field';
-import firebase from '@react-native-firebase/app';
-import firestore from '@react-native-firebase/firestore';
+import fontfamillies from '../../styles/fontfamillies';
+
 
 
 type RootStackParamList = {
-    Dashboard: {uid:string};
+    Dashboard: undefined;
     Login: undefined;
+    Rainfallpred:undefined;
+    Croppred:undefined;
+    Yieldpred:undefined;
 };
 
 type DashboardProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
 
-const Dashboard: React.FC<DashboardProps> = ({ route,navigation }) => {
-    const {uid}=route.params;
-    const [year,setYear] = useState('');
-    const [place,setPlace]= useState('');
-    const [rainfallprediction, setRainfallPrediction] = useState(null);
-    const [loading, setLoading] = useState(false);
-
-    const handlePredict = async () => {
-        setLoading(true);
-        setRainfallPrediction(null);
-        
-
-        try {
-            // Replace with your Flask API URL
-            const API_URL = 'http://192.168.87.147:5000/predict'; // For Android emulator
-            // const API_URL = 'http://localhost:5000/predict'; // For iOS simulator
-            // const API_URL = 'http://YOUR_LOCAL_IP:5000/predict'; // For physical devices
-
-            const response = await axios.post(API_URL, {
-                year:year,
-                place:place,
-            });
-
-            const prediction = response.data.predicted_rainfall;
-            setRainfallPrediction(prediction);
-
-            const data = {
-                Year: year,
-                Place: place,
-                RainfallPrediction: prediction // Save the actual predicted value
-            };
-            await firestore().collection('users').doc(uid).update({predictions:firestore.FieldValue.arrayUnion(data)});
-
-        } catch (error) {
-            console.error(error);
-            Alert.alert('Error', 'Failed to get prediction from the server.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-
+const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
     const handleLogout = async () => {
         try {
             await auth().signOut();
-            navigation.navigate('Login'); 
+            navigation.navigate('Login');
         } catch (error) {
             console.error(error);
         }
     };
 
+    const rainfallpred=()=>{
+        navigation.navigate('Rainfallpred');
+    };
+
+    const croppred=()=>{
+        navigation.navigate('Croppred');
+    };
+
+    const yieldpred=()=>{
+        navigation.navigate('Yieldpred');
+    };
+
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Welcome to the Dashboard!</Text>
-            <Text style={styles.subtitle}>You are successfully logged in.</Text>
-            <Text style={{ color: "black",marginBottom:10 }}>Flask API prediction:</Text>
-            <Field
-                placeholder="Enter the Year of prediction"
-                keyboardType="phone-pad"
-                value={year}
-                marginBottom={15}
-                onChangeText={setYear}
-            />
-            <Field
-                placeholder="Enter the name of place for prediction"
-                value={place}
-                marginBottom={15}
-                onChangeText={setPlace}
-            />
-            <View style={styles.buttons}>
-                <Buttons  btnLabel="Get Prediction" onPressHandler={handlePredict}  />
-            </View>
-            <Text style={{marginTop:10,marginBottom:25,color:"black"}}> Predicted Rainfall : {rainfallprediction}</Text>
-            <Buttons btnLabel="Logout" onPressHandler={handleLogout} />
+        
             
+        <View style={{ flex: 1 }}>
+            {/* Custom Navbar */}
+            <View style={styles.navbar}>
+                <Text style={styles.navTitle}>Dashboard</Text>
+                <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+                    <Text style={styles.logoutText}>Logout</Text>
+                </TouchableOpacity>
+            </View>
+
+            {/* Dashboard Content */}
+            <View style={styles.container}>
+                <TouchableOpacity onPress={rainfallpred} style={styles.touchable}>
+                    <ImageBackground source={require('../assets/Rainfall1.jpg')} style={styles.imageBackground}>
+                        <View style={styles.box}>
+                            <Text style={styles.text}>Rainfall Prediction</Text>
+                        </View>
+                    </ImageBackground>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={yieldpred} style={styles.touchable}>
+                    <ImageBackground source={require('../assets/yield3.jpg')} style={styles.imageBackground}>
+                        <View style={styles.box}>
+                            <Text style={styles.text}>Yield Prediction</Text>
+                        </View>
+                    </ImageBackground>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={croppred} style={styles.touchable}>
+                    <ImageBackground source={require('../assets/crop1.jpg')} style={styles.imageBackground}>
+                        <View style={styles.box}>
+                            <Text style={styles.text}>Crop Prediction</Text>
+                        </View>
+                    </ImageBackground>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
@@ -98,25 +86,58 @@ const Dashboard: React.FC<DashboardProps> = ({ route,navigation }) => {
 export default Dashboard;
 
 const styles = StyleSheet.create({
+    navbar: {
+        height: 70, // Adjust navbar height
+        backgroundColor: '#003300',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row',
+        paddingHorizontal: 15,
+    },
+    navTitle: {
+        color: 'white',
+        fontSize: 24,
+        fontWeight: 'bold',
+        paddingLeft:2,
+    },
+    logoutButton: {
+        backgroundColor: 'white',
+        paddingHorizontal: 15,
+        paddingVertical: 5,
+        borderRadius: 5,
+    },
+    logoutText: {
+        color: '#003300',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
     container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#f0f0f0',
+        padding: 10, // Adds padding around the container
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#333',
+    touchable: {
+        marginBottom: 20, // Gap between images
+        borderRadius: 30, // Ensures the touchable area also has rounded corners
+        overflow: 'hidden', // Ensures that overflow is hidden
     },
-    subtitle: {
-        fontSize: 18,
-        color: '#666',
-        marginBottom: 20,
+    imageBackground: {
+        width: 390,
+        height: 230,
+        justifyContent: 'center',
+        borderRadius: 30, // Ensure border radius is applied
     },
-    buttons:{
-        backgroundColor:"green",
-        borderRadius:100
+    box: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 10, // Padding for the text inside the box
+    },
+    text: {
+        color: 'white',
+        fontSize: 36,
+        textAlign: 'center',
+        fontFamily: fontfamillies.oleo,
     },
 });
