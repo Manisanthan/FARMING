@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, StyleSheet, ScrollView } from 'react-native';
 import Field from '../components/Field';
 import Buttons from '../components/Buttons';
 import auth from '@react-native-firebase/auth';
@@ -78,6 +78,8 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
     };
 
     return (
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+
         <View style={{ alignItems: 'center', width: '100%' }}>
             <Text
                 style={{
@@ -180,6 +182,7 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
                 </TouchableOpacity>
             </View>
         </View>
+        </ScrollView>
     );
 };
 const styles=StyleSheet.create({
@@ -193,6 +196,12 @@ const styles=StyleSheet.create({
         marginVertical: 8,
         width: '80%',
         backgroundColor: '#A9A9A9',
-    }
+    },
+
+    scrollContainer: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 })
 export default SignUp;

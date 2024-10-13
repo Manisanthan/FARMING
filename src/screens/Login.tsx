@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, StyleSheet, ScrollView } from 'react-native';
 import Field from '../components/Field';
 import Buttons from '../components/Buttons';
 import auth from '@react-native-firebase/auth';
@@ -111,80 +111,83 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     };
 
     return (
-        <View style={{ alignItems: 'center', width: '100%' }}>
-            <Text
-                style={{
-                    color: '#003300',
-                    fontSize: 70,
-                    fontWeight: 'bold',
-                    marginVertical: 20,
-                    marginTop: 230,
-                }}
-            >
-                Login
-            </Text>
-            <Text style={{ color: '#333333', marginTop: 0, fontSize: 20, fontWeight: 'bold' }}>
-                Login To Your Account
-            </Text>
-            <View style={Styles.container}>
-                <Icon name="user" size={23} color="#666" style={{ marginRight: 0 }} />
-                <Field
-                    placeholder="Email / Username"
-                    keyboardType="email-address"
-                    value={identifier}
-                    onChangeText={setIdentifier}
-                />
-            </View>
-            <View style={Styles.container1}>
-                <Icon name="lock" size={23} color="#666" style={{ marginRight: 0 }} />
-                <Field
-                    placeholder="Password"
-                    secureTextEntry={true}
-                    margin={0}
-                    value={password}
-                    onChangeText={setPassword}
-                />
-            </View>
-            <View
-                style={{
-                    alignItems: 'flex-end',
-                    width: '80%',
-                    paddingRight: 16,
-                    marginBottom: 220,
-                }}
-            >
-                <TouchableOpacity onPress={ForgotPassword}>
-                    <Text
-                        style={{
-                            color: '#003300',
-                            fontWeight: 'bold',
-                            fontSize: 16,
-                            marginTop: 15,
-                        }}
-                    >
-                        Forgot password?
-                    </Text>
-                </TouchableOpacity>
-            </View>
-            <Buttons btnLabel="Login" marginTop={15} onPressHandler={handleLogin} />
-            <View
-                style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    marginTop: 15,
-                }}
-            >
-                <Text style={{ color: 'black' }}>
-                    Don't have an account?{' '}
+        <ScrollView contentContainerStyle={Styles.scrollContainer}>
+
+            <View style={{ alignItems: 'center', width: '100%' }}>
+                <Text
+                    style={{
+                        color: '#003300',
+                        fontSize: 70,
+                        fontWeight: 'bold',
+                        marginVertical: 20,
+                        marginTop: 230,
+                    }}
+                >
+                    Login
                 </Text>
-                <TouchableOpacity onPress={signupNavigation}>
-                    <Text style={{ color: '#003300', fontWeight: 'bold' }}>
-                        SignUp
+                <Text style={{ color: '#333333', marginTop: 0, fontSize: 20, fontWeight: 'bold' }}>
+                    Login To Your Account
+                </Text>
+                <View style={Styles.container}>
+                    <Icon name="user" size={23} color="#666" style={{ marginRight: 0 }} />
+                    <Field
+                        placeholder="Email / Username"
+                        keyboardType="email-address"
+                        value={identifier}
+                        onChangeText={setIdentifier}
+                    />
+                </View>
+                <View style={Styles.container1}>
+                    <Icon name="lock" size={23} color="#666" style={{ marginRight: 0 }} />
+                    <Field
+                        placeholder="Password"
+                        secureTextEntry={true}
+                        margin={0}
+                        value={password}
+                        onChangeText={setPassword}
+                    />
+                </View>
+                <View
+                    style={{
+                        alignItems: 'flex-end',
+                        width: '80%',
+                        paddingRight: 16,
+                        marginBottom: 220,
+                    }}
+                >
+                    <TouchableOpacity onPress={ForgotPassword}>
+                        <Text
+                            style={{
+                                color: '#003300',
+                                fontWeight: 'bold',
+                                fontSize: 16,
+                                marginTop: 15,
+                            }}
+                        >
+                            Forgot password?
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+                <Buttons btnLabel="Login" marginTop={15} onPressHandler={handleLogin} />
+                <View
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        marginTop: 15,
+                    }}
+                >
+                    <Text style={{ color: 'black' }}>
+                        Don't have an account?{' '}
                     </Text>
-                </TouchableOpacity>
+                    <TouchableOpacity onPress={signupNavigation}>
+                        <Text style={{ color: '#003300', fontWeight: 'bold' }}>
+                            SignUp
+                        </Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-        </View>
+        </ScrollView>
     );
 };
 const Styles = StyleSheet.create({
@@ -209,7 +212,12 @@ const Styles = StyleSheet.create({
         marginVertical: 0,
         width: '80%',
         backgroundColor: '#A9A9A9',
-    }
+    },
+    scrollContainer: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 })
 
 export default Login;
