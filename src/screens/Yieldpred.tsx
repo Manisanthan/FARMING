@@ -24,7 +24,6 @@ const Yieldpred: React.FC<YieldpredProps> = ({ navigation }) => {
 
     const [year, setYear] = useState('');
     const [place, setPlace] = useState<string | null>(null);
-    const [open, setOpen] = useState(false);
     const[crop,setCrop]=useState('');
     const[fertilizer,setFertilizer]=useState('');
     const[pesticide,setPesticide]=useState('');
@@ -129,7 +128,7 @@ const Yieldpred: React.FC<YieldpredProps> = ({ navigation }) => {
 
         try {
             // Replace with your Flask API URL
-            const API_URL = 'http://192.168.29.6:5000/api/predict'; // For Android emulator
+            const API_URL = 'https://opposite-leda-manisanthan-fb8be05b.koyeb.app/api/predict'; // For Android emulator
             // const API_URL = 'http://localhost:5000/api/predict'; // For iOS simulator
             // const API_URL = 'http://YOUR_LOCAL_IP:5000/api/predict'; // For physical devices
 
@@ -241,7 +240,7 @@ const Yieldpred: React.FC<YieldpredProps> = ({ navigation }) => {
                     {/* Display Prediction */}
                     {yieldPrediction !== null && (
                         <Text style={styles.predictionText}>
-                            Predicted Yield: {yieldPrediction} tons/ha.
+                            Predicted Yield : {yieldPrediction} tons/ha.
                         </Text>
                     )}
                 </View>

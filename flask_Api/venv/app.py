@@ -2,17 +2,18 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 import traceback
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# Load the dataset and preprocess it (this assumes both rainfall and yield data are available)
-data = pd.read_csv('crop.csv')  # Adjust the path accordingly
+# Load the datasets for rainfall, yield, and crop predictions
+data = pd.read_csv('../venv/crop.csv')  # For rainfall and yield (adjust path)
+crop_data = pd.read_csv('../venv/limited_top_ten_crops.csv')  # For crop prediction (adjust path)
 
-# Encode categorical variables
+# Preprocessing for Rainfall and Yield Prediction
 label_encoders = {}
 for column in ['Crop', 'Season', 'State']:
     le = LabelEncoder()
@@ -26,18 +27,33 @@ y_rainfall = data['Annual_Rainfall']
 X_yield = data[['Crop_Year', 'State', 'Annual_Rainfall', 'Crop', 'Fertilizer', 'Pesticide']]
 y_yield = data['Yield']
 
-# Train models for both rainfall and yield
-X_train_rainfall, X_test_rainfall, y_train_rainfall, y_test_rainfall = train_test_split(
-    X_rainfall, y_rainfall, test_size=0.2, random_state=42
-)
+# Train RandomForestRegressor models for rainfall and yield
 rf_model_rainfall = RandomForestRegressor(n_estimators=100, random_state=42)
-rf_model_rainfall.fit(X_train_rainfall, y_train_rainfall)
+rf_model_rainfall.fit(X_rainfall, y_rainfall)
 
-X_train_yield, X_test_yield, y_train_yield, y_test_yield = train_test_split(
-    X_yield, y_yield, test_size=0.2, random_state=42
-)
 rf_model_yield = RandomForestRegressor(n_estimators=100, random_state=42)
-rf_model_yield.fit(X_train_yield, y_train_yield)
+rf_model_yield.fit(X_yield, y_yield)
+
+# Preprocessing for Crop Prediction
+crop_le = LabelEncoder()
+crop_data['Crop'] = crop_le.fit_transform(crop_data['Crop'])
+
+# One-hot encode 'Season' and 'State'
+crop_data = pd.get_dummies(crop_data, columns=['Season', 'State'], drop_first=True)
+
+# Scale numerical features
+scaler = StandardScaler()
+crop_data[['Area', 'Annual_Rainfall', 'Fertilizer', 'Pesticide']] = scaler.fit_transform(
+    crop_data[['Area', 'Annual_Rainfall', 'Fertilizer', 'Pesticide']]
+)
+
+# Features (X) and target (y) for crop prediction
+X_crop = crop_data.drop('Crop', axis=1)
+y_crop = crop_data['Crop']
+
+# Train RandomForestClassifier for crop prediction
+rf_model_crop = RandomForestClassifier(random_state=42)
+rf_model_crop.fit(X_crop, y_crop)
 
 
 # Function to predict rainfall
@@ -65,11 +81,11 @@ def predict_rainfall(year, state):
     })
 
     predicted_rainfall = rf_model_rainfall.predict(input_data)[0]
-    return round(predicted_rainfall, 2) 
+    return round(predicted_rainfall, 2)
 
 
 # Function to predict yield
-def predict_yield(year, state, crop,rainfall, fertilizer, pesticide):
+def predict_yield(year, state, crop, rainfall, fertilizer, pesticide):
     state_encoded = label_encoders['State'].transform([state])[0]
     crop_encoded = label_encoders['Crop'].transform([crop])[0]
 
@@ -86,6 +102,41 @@ def predict_yield(year, state, crop,rainfall, fertilizer, pesticide):
     return round(predicted_yield, 2)
 
 
+# Function to predict crop
+def predict_crop(area, rainfall, fertilizer, pesticide, season, state):
+    input_data = pd.DataFrame({
+        'Area': [area],
+        'Annual_Rainfall': [rainfall],
+        'Fertilizer': [fertilizer],
+        'Pesticide': [pesticide]
+    })
+
+    # Add one-hot encoded columns for 'Season' and 'State'
+    for col in X_crop.columns:
+        if col.startswith('Season_') or col.startswith('State_'):
+            input_data[col] = 0
+
+    # Set the appropriate season and state column to 1
+    if 'Season_' + season in input_data.columns:
+        input_data['Season_' + season] = 1
+    if 'State_' + state in input_data.columns:
+        input_data['State_' + state] = 1
+
+    # Reorder columns to match training data
+    input_data = input_data.reindex(columns=X_crop.columns, fill_value=0)
+
+    # Scale the numerical columns
+    input_data[['Area', 'Annual_Rainfall', 'Fertilizer', 'Pesticide']] = scaler.transform(
+        input_data[['Area', 'Annual_Rainfall', 'Fertilizer', 'Pesticide']]
+    )
+
+    # Make prediction
+    prediction = rf_model_crop.predict(input_data)
+    predicted_crop = crop_le.inverse_transform(prediction)
+    return predicted_crop[0]
+
+
+# API routes
 @app.route('/')
 def home():
     return "Flask API is running!"
@@ -105,19 +156,32 @@ def predict():
         year = int(data.get('year'))
         state = str(data.get('place'))
 
-        # Check if request is for rainfall or yield prediction
+        # Predict Rainfall
+        rainfall = predict_rainfall(year, state)
+
+        # Check if request is for yield prediction
         if 'crop' in data and 'fertilizer' in data and 'pesticide' in data:
+          
             crop = str(data.get('crop'))
             fertilizer = float(data.get('fertilizer'))
             pesticide = float(data.get('pesticide'))
 
-            rainfall=predict_rainfall(year, state)
-
-            prediction = predict_yield(year, state, crop,rainfall, fertilizer, pesticide)
+            prediction = predict_yield(year, state, crop, rainfall, fertilizer, pesticide)
             return jsonify({'prediction': prediction, 'type': 'yield'}), 200
+
+        # Check if request is for crop prediction
+        elif 'area' in data and 'fertilizer' in data and 'pesticide' in data and 'season' in data:
+            area = float(data.get('area'))
+            fertilizer = float(data.get('fertilizer'))
+            pesticide = float(data.get('pesticide'))
+            season = str(data.get('season'))
+
+            prediction = predict_crop(area, rainfall, fertilizer, pesticide, season, state)
+            return jsonify({'prediction': prediction, 'type': 'crop'}), 200
+
         else:
-            prediction = predict_rainfall(year, state)
-            return jsonify({'prediction': prediction, 'type': 'rainfall'}), 200
+            # Only rainfall prediction
+            return jsonify({'prediction': rainfall, 'type': 'rainfall'}), 200
 
     except Exception as e:
         traceback.print_exc()  # Print error to server log for debugging

@@ -10,6 +10,7 @@ import fontfamillies from '../../styles/fontfamillies';
 
 
 type RootStackParamList = {
+    Home:undefined;
     Dashboard: undefined;
     Login: undefined;
     Rainfallpred:undefined;
@@ -23,7 +24,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
     const handleLogout = async () => {
         try {
             await auth().signOut();
-            navigation.navigate('Login');
+            navigation.navigate('Home');
         } catch (error) {
             console.error(error);
         }
