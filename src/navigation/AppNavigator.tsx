@@ -9,6 +9,11 @@ import VerifyCode from '../screens/VerifyCode';
 import Rainfallpred from '../screens/Rainfallpred';
 import Yieldpred from '../screens/Yieldpred';
 import Croppred from '../screens/Croppred';
+import DL from '../screens/DL';
+import ML from '../screens/ML';
+import Vgg16Model from '../screens/Vgg16Model';
+
+
 
 export type RootStackParamList = {
     Home: undefined;
@@ -19,6 +24,9 @@ export type RootStackParamList = {
     Rainfallpred:undefined;
     Yieldpred:undefined;
     Croppred:undefined;
+    ML:undefined;
+    DL:undefined;
+    Vgg16Model:undefined;
 
 };
 
@@ -36,6 +44,11 @@ const AppNavigator: React.FC = () => {
                 <Stack.Screen name="Rainfallpred" component={Rainfallpred} />
                 <Stack.Screen name="Yieldpred" component={Yieldpred} />
                 <Stack.Screen name="Croppred" component={Croppred} />
+                <Stack.Screen name="ML" component={ML} />
+                <Stack.Screen name="DL" component={DL} />
+                <Stack.Screen name="Vgg16Model" component={Vgg16Model} />
+
+
 
             </Stack.Navigator>
         </NavigationContainer>

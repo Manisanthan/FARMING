@@ -10,62 +10,62 @@ import fontfamillies from '../../styles/fontfamillies';
 
 
 type RootStackParamList = {
-    Home:undefined;
-    DL:undefined;
-    ML:undefined;
+    Home: undefined;
     Dashboard: undefined;
     Login: undefined;
-    Rainfallpred:undefined;
-    Croppred:undefined;
-    Yieldpred:undefined;
+    Rainfallpred: undefined;
+    Croppred: undefined;
+    Yieldpred: undefined;
+    ML:undefined;
 };
 
-type DashboardProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
+type MLProps = NativeStackScreenProps<RootStackParamList, 'ML'>;
 
-const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
-    const handleLogout = async () => {
-        try {
-            await auth().signOut();
-            navigation.navigate('Home');
-        } catch (error) {
-            console.error(error);
-        }
+const ML: React.FC<MLProps> = ({ navigation }) => {
+
+    const rainfallpred = () => {
+        navigation.navigate('Rainfallpred');
     };
 
-    const ML=()=>{
-        navigation.navigate('ML');
+    const croppred = () => {
+        navigation.navigate('Croppred');
     };
 
-    const DL=()=>{
-        navigation.navigate('DL');
+    const yieldpred = () => {
+        navigation.navigate('Yieldpred');
     };
 
     return (
-        
-            
+
+
         <View style={{ flex: 1 }}>
             {/* Custom Navbar */}
             <View style={styles.navbar}>
-                <Text style={styles.navTitle}>Dashboard</Text>
-                <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-                    <Text style={styles.logoutText}>Logout</Text>
-                </TouchableOpacity>
+                <Text style={styles.navTitle}>AI-FARMING-ML</Text>
             </View>
 
             {/* Dashboard Content */}
             <View style={styles.container}>
-                <TouchableOpacity onPress={ML} style={styles.touchable}>
-                    <ImageBackground source={require('../assets/ML.jpeg')} style={styles.imageBackground}>
+                <TouchableOpacity onPress={rainfallpred} style={styles.touchable}>
+                    <ImageBackground source={require('../assets/Rainfall1.jpg')} style={styles.imageBackground}>
                         <View style={styles.box}>
-                            <Text style={styles.text}>Machine Learning Model</Text>
+                            <Text style={styles.text}>Rainfall Prediction</Text>
                         </View>
                     </ImageBackground>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={DL} style={styles.touchable}>
-                    <ImageBackground source={require('../assets/DL3.jpg')} style={styles.imageBackground}>
+                <TouchableOpacity onPress={yieldpred} style={styles.touchable}>
+                    <ImageBackground source={require('../assets/yield3.jpg')} style={styles.imageBackground}>
                         <View style={styles.box}>
-                            <Text style={styles.text}>Deep Learning Model</Text>
+                            <Text style={styles.text}>Yield Prediction</Text>
+                        </View>
+                    </ImageBackground>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={croppred} style={styles.touchable}>
+                    <ImageBackground source={require('../assets/crop1.jpg')} style={styles.imageBackground}>
+                        <View style={styles.box}>
+                            <Text style={styles.text}>Crop Prediction</Text>
                         </View>
                     </ImageBackground>
                 </TouchableOpacity>
@@ -74,13 +74,13 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
     );
 };
 
-export default Dashboard;
+export default ML;
 
 const styles = StyleSheet.create({
     navbar: {
         height: 70, // Adjust navbar height
         backgroundColor: '#003300',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
         paddingHorizontal: 15,
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 24,
         fontWeight: 'bold',
-        paddingLeft:2,
+        paddingLeft: 2,
     },
     logoutButton: {
         backgroundColor: 'white',

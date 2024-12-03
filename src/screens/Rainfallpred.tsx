@@ -51,7 +51,7 @@ const Rainfallpred: React.FC = () => {
         setRainfallPrediction(null);
 
         try {
-            const API_URL = 'https://opposite-leda-manisanthan-fb8be05b.koyeb.app/api/predict'; // Replace with your Flask API URL
+            const API_URL = 'https://effective-saraann-karthik123-95422b9f.koyeb.app/api/predict'; // Replace with your Flask API URL
             const response = await axios.post(API_URL, {
                 year: year,
                 place: place,

@@ -128,7 +128,7 @@ const Yieldpred: React.FC<YieldpredProps> = ({ navigation }) => {
 
         try {
             // Replace with your Flask API URL
-            const API_URL = 'https://opposite-leda-manisanthan-fb8be05b.koyeb.app/api/predict'; // For Android emulator
+            const API_URL = 'https://effective-saraann-karthik123-95422b9f.koyeb.app/api/predict'; // For Android emulator
             // const API_URL = 'http://localhost:5000/api/predict'; // For iOS simulator
             // const API_URL = 'http://YOUR_LOCAL_IP:5000/api/predict'; // For physical devices
 

@@ -10,62 +10,42 @@ import fontfamillies from '../../styles/fontfamillies';
 
 
 type RootStackParamList = {
-    Home:undefined;
+    Home: undefined;
+    Vgg16Model:undefined;
     DL:undefined;
-    ML:undefined;
     Dashboard: undefined;
     Login: undefined;
-    Rainfallpred:undefined;
-    Croppred:undefined;
-    Yieldpred:undefined;
+    Rainfallpred: undefined;
+    Croppred: undefined;
+    Yieldpred: undefined;
+    ML: undefined;
 };
 
-type DashboardProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
+type DLProps = NativeStackScreenProps<RootStackParamList, 'DL'>;
 
-const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
-    const handleLogout = async () => {
-        try {
-            await auth().signOut();
-            navigation.navigate('Home');
-        } catch (error) {
-            console.error(error);
-        }
+const DL: React.FC<DLProps> = ({ navigation }) => {
+
+    const Vgg16Model = () => {
+        navigation.navigate('Vgg16Model');
     };
 
-    const ML=()=>{
-        navigation.navigate('ML');
-    };
-
-    const DL=()=>{
-        navigation.navigate('DL');
-    };
+    
 
     return (
-        
-            
+
+
         <View style={{ flex: 1 }}>
             {/* Custom Navbar */}
             <View style={styles.navbar}>
-                <Text style={styles.navTitle}>Dashboard</Text>
-                <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-                    <Text style={styles.logoutText}>Logout</Text>
-                </TouchableOpacity>
+                <Text style={styles.navTitle}>AI-FARMING-DL</Text>
             </View>
 
             {/* Dashboard Content */}
             <View style={styles.container}>
-                <TouchableOpacity onPress={ML} style={styles.touchable}>
-                    <ImageBackground source={require('../assets/ML.jpeg')} style={styles.imageBackground}>
+                <TouchableOpacity onPress={Vgg16Model} style={styles.touchable}>
+                    <ImageBackground source={require('../assets/DL2.jpg')} style={styles.imageBackground}>
                         <View style={styles.box}>
-                            <Text style={styles.text}>Machine Learning Model</Text>
-                        </View>
-                    </ImageBackground>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={DL} style={styles.touchable}>
-                    <ImageBackground source={require('../assets/DL3.jpg')} style={styles.imageBackground}>
-                        <View style={styles.box}>
-                            <Text style={styles.text}>Deep Learning Model</Text>
+                            <Text style={styles.text}>VGG16 Crop Prediction</Text>
                         </View>
                     </ImageBackground>
                 </TouchableOpacity>
@@ -74,22 +54,23 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
     );
 };
 
-export default Dashboard;
+export default DL;
 
 const styles = StyleSheet.create({
     navbar: {
         height: 70, // Adjust navbar height
         backgroundColor: '#003300',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
         paddingHorizontal: 15,
+        
     },
     navTitle: {
         color: 'white',
         fontSize: 24,
         fontWeight: 'bold',
-        paddingLeft:2,
+        paddingLeft: 2,
     },
     logoutButton: {
         backgroundColor: 'white',
