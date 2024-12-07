@@ -11,6 +11,7 @@ import fontfamillies from '../../styles/fontfamillies';
 
 type RootStackParamList = {
     Home: undefined;
+    Land:undefined;
     Vgg16Model:undefined;
     DL:undefined;
     Dashboard: undefined;
@@ -29,6 +30,9 @@ const DL: React.FC<DLProps> = ({ navigation }) => {
         navigation.navigate('Vgg16Model');
     };
 
+    const LandClassification = () => {
+        navigation.navigate('Land');
+    };
     
 
     return (
@@ -45,11 +49,22 @@ const DL: React.FC<DLProps> = ({ navigation }) => {
                 <TouchableOpacity onPress={Vgg16Model} style={styles.touchable}>
                     <ImageBackground source={require('../assets/DL2.jpg')} style={styles.imageBackground}>
                         <View style={styles.box}>
-                            <Text style={styles.text}>VGG16 Crop Prediction</Text>
+                            <Text style={styles.text}>Arial View Crop Prediction</Text>
                         </View>
                     </ImageBackground>
                 </TouchableOpacity>
+
+                <TouchableOpacity onPress={LandClassification} style={styles.touchable}>
+                    <ImageBackground source={require('../assets/land.png')} style={styles.imageBackground}>
+                        <View style={styles.box}>
+                            <Text style={styles.text}>Realtime Google Earth Engine Land Prediction</Text>
+                        </View>
+                    </ImageBackground>
+                </TouchableOpacity>
+
+
             </View>
+            
         </View>
     );
 };

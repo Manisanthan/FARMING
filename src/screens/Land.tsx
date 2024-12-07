@@ -6,7 +6,7 @@ import Field from '../components/Field';
 
 
 
-const Vgg16Model: React.FC = () => {
+const Land: React.FC = () => {
     const [filePath, setFilePath] = useState<string>('');
     const [groundTruthLabel, setGroundTruthLabel] = useState<string | null>(null);
     const [predictedLabel, setPredictedLabel] = useState<string | null>(null);
@@ -14,7 +14,7 @@ const Vgg16Model: React.FC = () => {
     const [loading, setLoading] = useState(false);
 
 
-    const predictCrop = async () => {
+    const predictLand = async () => {
         if (!filePath) {
             Alert.alert('Error', 'Please provide a file path.');
             return;
@@ -26,7 +26,7 @@ const Vgg16Model: React.FC = () => {
         setPredictedLabel(null);
         setImageUrl(null);
 
-        const url = 'http://192.168.40.147:5000//predict_crop'; // Replace with your server URL
+        const url = 'http://192.168.40.147:5000/predict_land'; // Replace with your server URL
 
         try {
             const response = await axios.post(
@@ -37,10 +37,10 @@ const Vgg16Model: React.FC = () => {
             if (response.status === 200) {
                 const result = response.data;
                 setGroundTruthLabel(result.ground_truth);
-                setPredictedLabel(result.predicted_label);
+                setPredictedLabel(result.predicted_class);
                 // Append a timestamp to force image refresh
                 setImageUrl(
-                    `http://192.168.40.147:5000/static/prediction_result.png?timestamp=${Date.now()}`
+                    `http://192.168.40.147:5000/static2/Land_prediction_result.png`
                 );
             } else {
                 Alert.alert('Error', `Server error: ${response.data}`);
@@ -55,7 +55,7 @@ const Vgg16Model: React.FC = () => {
 
     return (
         <ScrollView style={styles.container}>
-            <Text style={styles.title}>Arial View Crop Prediction</Text>
+            <Text style={styles.title}>Realtime Google Earth Engine Land Prediction</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Enter File Path"
@@ -63,9 +63,9 @@ const Vgg16Model: React.FC = () => {
                 value={filePath}
                 onChangeText={setFilePath}
             />
-            <TouchableOpacity style={styles.button} onPress={predictCrop} disabled={loading}>
+            <TouchableOpacity style={styles.button} onPress={predictLand} disabled={loading}>
                 <Text style={styles.buttonText}>{loading ? 'Predicting...' : 'Predict'}</Text>
-            </TouchableOpacity>            
+            </TouchableOpacity>
             <View style={styles.resultContainer}>
                 {groundTruthLabel && (
                     <>
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         fontSize: 16,
         marginBottom: 0,
-        color:"black",
+        color: "black",
     },
     resultContainer: {
         marginTop: 20,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
         width: '80%',
         height: 55,
         marginTop: 20,
-        marginLeft:35,
+        marginLeft: 35,
     },
     buttonText: {
         fontSize: 22,
@@ -153,4 +153,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Vgg16Model;
+export default Land;

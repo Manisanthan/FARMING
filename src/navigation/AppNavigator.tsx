@@ -12,12 +12,14 @@ import Croppred from '../screens/Croppred';
 import DL from '../screens/DL';
 import ML from '../screens/ML';
 import Vgg16Model from '../screens/Vgg16Model';
+import Land from '../screens/Land'
 
 
 
 export type RootStackParamList = {
     Home: undefined;
     Login: undefined;
+    Land:undefined;
     SignUp: undefined;
     Dashboard: undefined;
     VerifyCode: { phoneNumber: string; confirmation: any };
@@ -47,6 +49,7 @@ const AppNavigator: React.FC = () => {
                 <Stack.Screen name="ML" component={ML} />
                 <Stack.Screen name="DL" component={DL} />
                 <Stack.Screen name="Vgg16Model" component={Vgg16Model} />
+                <Stack.Screen name="Land" component={Land} />
 
 
 
