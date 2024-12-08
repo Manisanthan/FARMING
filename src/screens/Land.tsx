@@ -1,88 +1,129 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Image, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
-import axios from 'axios';
+import {
+    View, Text, Image, StyleSheet, ScrollView, Alert, TouchableOpacity, ActivityIndicator,
+} from 'react-native';
+import * as ImagePicker from 'react-native-image-picker'; // Install: react-native-image-picker
 import fontfamillies from '../../styles/fontfamillies';
-import Field from '../components/Field';
-
 
 
 const Land: React.FC = () => {
-    const [filePath, setFilePath] = useState<string>('');
-    const [groundTruthLabel, setGroundTruthLabel] = useState<string | null>(null);
-    const [predictedLabel, setPredictedLabel] = useState<string | null>(null);
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [selectedImage, setSelectedImage] = useState<any>(null); // Stores selected image
+    const [predictedLabel, setPredictedLabel] = useState<string | null>(null); // Predicted label
+    const [confidence, setConfidence] = useState<number | null>(null); // Confidence score
+    const [resultImageUrl, setResultImageUrl] = useState<string | null>(null); // URL of prediction plot
+    const [loading, setLoading] = useState(false); // Loading state
 
+    const pickImage = async () => {
+        ImagePicker.launchImageLibrary(
+            { mediaType: 'photo', quality: 1 },
+            (response) => {
+                if (response.didCancel) {
+                    Alert.alert('Cancelled', 'Image selection was cancelled.');
+                } else if (response.errorCode) {
+                    Alert.alert('Error', `ImagePicker Error: ${response.errorMessage}`);
+                } else if (response.assets && response.assets.length > 0) {
+                    const image = response.assets[0];
+                    setSelectedImage(image); // Save the selected image
+                }
+            }
+        );
+    };
 
-    const predictLand = async () => {
-        if (!filePath) {
-            Alert.alert('Error', 'Please provide a file path.');
+    const predictCrop = async () => {
+        if (!selectedImage) {
+            Alert.alert('Error', 'Please select an image first.');
             return;
         }
 
-        // Reset previous results before making the new prediction
-        setLoading(true);
-        setGroundTruthLabel(null);
+        setLoading(true); // Start loading
         setPredictedLabel(null);
-        setImageUrl(null);
+        setConfidence(null);
+        setResultImageUrl(null);
 
-        const url = 'http://192.168.40.147:5000/predict_land'; // Replace with your server URL
+        const formData = new FormData();
+        formData.append('file', {
+            uri: selectedImage.uri,
+            name: selectedImage.fileName || 'image.jpg',
+            type: selectedImage.type || 'image/jpeg',
+        });
 
         try {
-            const response = await axios.post(
-                url,
-                { filename: filePath }
-            );
+            const response = await fetch('http://192.168.29.6:5000/predict_land', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                body: formData,
+            });
 
-            if (response.status === 200) {
-                const result = response.data;
-                setGroundTruthLabel(result.ground_truth);
-                setPredictedLabel(result.predicted_class);
-                // Append a timestamp to force image refresh
-                setImageUrl(
-                    `http://192.168.40.147:5000/static2/Land_prediction_result.png`
-                );
-            } else {
-                Alert.alert('Error', `Server error: ${response.data}`);
+            if (!response.ok) {
+                throw new Error('Failed to get prediction from the server.');
             }
+
+            const result = await response.json();
+
+            if (result.error) {
+                throw new Error(result.error);
+            }
+
+            // Update state with results
+            setPredictedLabel(result.predicted_label);
+            setConfidence(result.confidence);
+            setResultImageUrl(
+                `http://192.168.29.6:5000/static2/Land_prediction_result.png?${new Date().getTime()}`
+            ); /// Force image refresh
         } catch (error) {
-            Alert.alert('Error', 'Failed to fetch prediction.');
+            Alert.alert('Error', `Failed to predict crop: ${error}`);
             console.error(error);
         } finally {
-            setLoading(false);
+            setLoading(false); // Stop loading
         }
     };
 
     return (
         <ScrollView style={styles.container}>
-            <Text style={styles.title}>Realtime Google Earth Engine Land Prediction</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Enter File Path"
-                placeholderTextColor="#888"
-                value={filePath}
-                onChangeText={setFilePath}
-            />
-            <TouchableOpacity style={styles.button} onPress={predictLand} disabled={loading}>
-                <Text style={styles.buttonText}>{loading ? 'Predicting...' : 'Predict'}</Text>
+            <Text style={styles.title}>G.E Land Prediction</Text>
+
+            {/* Button to Select Image */}
+            <TouchableOpacity style={styles.button} onPress={pickImage}>
+                <Text style={styles.buttonText}>Select Image</Text>
             </TouchableOpacity>
-            <View style={styles.resultContainer}>
-                {groundTruthLabel && (
-                    <>
-                        <Text style={styles.label}>Ground Truth:</Text>
-                        <Text style={styles.result}>{groundTruthLabel}</Text>
-                    </>
+
+            {/* Display Selected Image */}
+            {selectedImage && (
+                <Image
+                    source={{ uri: selectedImage.uri }}
+                    style={styles.selectedImage}
+                />
+            )}
+
+            {/* Button to Predict */}
+            <TouchableOpacity style={styles.button} onPress={predictCrop} disabled={loading}>
+                {loading ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                    <Text style={styles.buttonText}>Predict</Text>
                 )}
+            </TouchableOpacity>
+
+            {/* Prediction Results */}
+            <View style={styles.resultContainer}>
                 {predictedLabel && (
                     <>
-                        <Text style={styles.label}>Predicted Label:</Text>
+                        <Text style={styles.label}>Predicted Class:</Text>
                         <Text style={styles.result}>{predictedLabel}</Text>
                     </>
                 )}
-                {imageUrl ? (
-                    <Image source={{ uri: imageUrl }} style={styles.image} />
+                {confidence !== null && (
+                    <>
+                        <Text style={styles.label}>Confidence:</Text>
+                        <Text style={styles.result}>{(confidence * 100).toFixed(2)}%</Text>
+                    </>
+                )}
+                {resultImageUrl ? (
+                    <Image source={{ uri: resultImageUrl }} style={styles.resultImage} />
                 ) : (
-                    <Text style={styles.noImage}>No prediction image available.</Text>
+                    <Text style={styles.noImage}>No result image available.</Text>
                 )}
             </View>
         </ScrollView>
@@ -96,41 +137,39 @@ const styles = StyleSheet.create({
         backgroundColor: '#f5f5f5',
     },
     title: {
-        fontSize: 40,
-        color: '#000',
+        fontSize: 30,
+        color: '#003300',
         textAlign: 'center',
         marginBottom: 20,
         fontFamily: fontfamillies.oleo,
+
     },
-    input: {
-        borderWidth: 1,
-        borderColor: 'black',
-        padding: 10,
+    selectedImage: {
+        height: 200,
+        width: '100%',
+        marginTop: 20,
         borderRadius: 8,
-        fontSize: 16,
-        marginBottom: 0,
-        color: "black",
     },
     resultContainer: {
         marginTop: 20,
     },
     label: {
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
         color: '#333',
     },
     result: {
-        fontSize: 18,
+        fontSize: 16,
         color: '#666',
         marginBottom: 10,
     },
     noImage: {
-        fontSize: 18,
+        fontSize: 16,
         color: '#aaa',
         textAlign: 'center',
         marginTop: 20,
     },
-    image: {
+    resultImage: {
         height: 250,
         width: '100%',
         marginTop: 20,
@@ -138,18 +177,18 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: '#003300',
-        borderRadius: 100,
+        borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
         width: '80%',
-        height: 55,
+        height: 50,
         marginTop: 20,
-        marginLeft: 35,
+        alignSelf: 'center',
     },
     buttonText: {
-        fontSize: 22,
-        color: '#f0f0f0',
-        fontWeight: 'bold'
+        fontSize: 18,
+        color: '#fff',
+        fontWeight: 'bold',
     },
 });
 
