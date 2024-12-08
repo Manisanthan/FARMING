@@ -55,7 +55,7 @@ const DL: React.FC<DLProps> = ({ navigation }) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={LandClassification} style={styles.touchable}>
-                    <ImageBackground source={require('../assets/land.png')} style={styles.imageBackground}>
+                    <ImageBackground source={require('../assets/land1.jpg')} style={styles.imageBackground}>
                         <View style={styles.box}>
                             <Text style={styles.text}>Realtime Google Earth Engine Land Prediction</Text>
                         </View>
